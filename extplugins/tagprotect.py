@@ -8,7 +8,6 @@ import b3, threading, thread, time
 import b3.plugin
 import b3.events
 from b3 import clients
-from xml.etree.ElementTree import *
 
 class TagprotectPlugin(b3.plugin.Plugin):
     
