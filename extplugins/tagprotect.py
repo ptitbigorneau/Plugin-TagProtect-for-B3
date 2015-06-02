@@ -468,7 +468,7 @@ class TagprotectPlugin(b3.plugin.Plugin):
         tagprotectiniw.write(newcontenu)
         tagprotectiniw.close()
 
-    def wait(temps):
+    def wait(self, temps):
 
         time.sleep(temps)
         return
