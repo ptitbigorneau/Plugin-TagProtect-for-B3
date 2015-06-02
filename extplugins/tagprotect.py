@@ -92,7 +92,7 @@ class TagprotectPlugin(b3.plugin.Plugin):
             
             self.debug('TagProtect %s'%(self._pluginactived))
             
-            if (event.type == b3.events.EVT_CLIENT_CONNECT) or (event.type == b3.events.EVT_CLIENT_AUTH) or (event.type == b3.events.EVT_CLIENT_NAME_CHANGE):
+            if (event.type == b3.events.EVT_CLIENT_AUTH) or (event.type == b3.events.EVT_CLIENT_NAME_CHANGE):
                     
                 client = event.client
                 self.debug('TagProtect client : %s'%(client.name))
@@ -468,7 +468,7 @@ class TagprotectPlugin(b3.plugin.Plugin):
         tagprotectiniw.write(newcontenu)
         tagprotectiniw.close()
 
-    def wait(self, temps):
+    def wait(temps):
 
         time.sleep(temps)
         return
