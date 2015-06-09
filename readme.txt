@@ -2,7 +2,7 @@
 # Plugin for B3 (www.bigbrotherbot.com)
 # www.ptitbigorneau.fr
 
-tagprotect plugin (v1.3.1) for B3
+tagprotect plugin (v1.4) for B3
 
 Installation:
 

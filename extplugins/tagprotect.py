@@ -1,7 +1,7 @@
 # TagProtect Plugin
 
 __author__  = 'PtitBigorneau www.ptitbigorneau.fr'
-__version__ = '1.3.1'
+__version__ = '1.4'
 
 
 import b3, threading, thread, time
@@ -18,8 +18,8 @@ class TagprotectPlugin(b3.plugin.Plugin):
     _clanexacttag = None
     _clansecondtag = None
     _clanapprotag = None
-    _pluginactived = "off"
     _banactived = "no"
+    _pluginactived = "off"
 
     def onStartup(self):
         
@@ -72,51 +72,97 @@ class TagprotectPlugin(b3.plugin.Plugin):
             self.warning("clanapprotag is None. %s" % (err))
 
         try:
-             self._pluginactived = self.config.get('settings', 'pluginactived')
-        except Exception, err:    
-            self.warning("pluginactived using default value. %s" % (err))
-
-        try:
             self._banactived = self.config.get('settings', 'banactived')
         except Exception, err:    
             self.warning("banactived using default value. %s" % (err))
+			
+        try:
+             self._pluginactived = self.config.get('settings', 'pluginactived')
+        except Exception, err:    
+            self.warning("pluginactived using default value. %s" % (err))
     
     def onEvent(self, event):
 
-        if self._pluginactived == 'off':
+        if (event.type == b3.events.EVT_CLIENT_AUTH) or (event.type == b3.events.EVT_CLIENT_NAME_CHANGE):
+		
+            if self._pluginactived == 'off':
            
-           self.debug('TagProtect %s'%(self._pluginactived))
-           return False
+               self.debug('TagProtect %s'%(self._pluginactived))
+               return False
 
-        if self._pluginactived == 'on':
+            if self._pluginactived == 'on':
             
-            self.debug('TagProtect %s'%(self._pluginactived))
-            
-            if (event.type == b3.events.EVT_CLIENT_AUTH) or (event.type == b3.events.EVT_CLIENT_NAME_CHANGE):
+                self.debug('TagProtect %s'%(self._pluginactived))
                     
-                client = event.client
-                self.debug('TagProtect client : %s'%(client.name))
-                if client.maxLevel == 100:
-                    self.debug('TagProtect superadmin : %s'%(client.name))
-                    return False
+            client = event.client
+            self.debug('TagProtect client : %s'%(client.name))
+            if client.maxLevel == 100:
+                self.debug('TagProtect superadmin : %s'%(client.name))
+                return False
 
-                cnamemin = client.name.lower()
+            cnamemin = client.name.lower()
 
-                exacttagmin = self._clanexacttag.lower()
+            exacttagmin = self._clanexacttag.lower()
 
-                cexacttagmin = cnamemin.count(exacttagmin)
+            cexacttagmin = cnamemin.count(exacttagmin)
 
-                secondtagmin = self._clansecondtag.lower()
+            secondtagmin = self._clansecondtag.lower()
 
-                csecondtagmin =  cnamemin.count(secondtagmin)
+            csecondtagmin =  cnamemin.count(secondtagmin)
 
-                approtagmin = self._clanapprotag.lower()
+            approtagmin = self._clanapprotag.lower()
 
-                capprotagmin =  cnamemin.count(approtagmin)
-                self.debug('%s - %s - %s'%(exacttagmin, secondtagmin, approtagmin))
+            capprotagmin =  cnamemin.count(approtagmin)
+            self.debug('%s - %s - %s'%(exacttagmin, secondtagmin, approtagmin))
                 
-                if cexacttagmin > 0:
+            if cexacttagmin > 0:
     
+                cursor = self.console.storage.query("""
+                SELECT *
+                FROM tagprotect n 
+                WHERE n.client_id = %s
+                """ % (client.id))
+        
+                if cursor.rowcount == 0:
+                
+                    tag = self._clanexacttag
+                    thread.start_new_thread(self.bantag, (client, event, tag))
+                
+                else:
+                        
+                    thread.start_new_thread(self.wait, (10,))
+                    client.message('Hi ! ^1%s^7 member'%(self._clanexacttag))
+                        
+                    return False
+                
+            elif csecondtagmin > 0:
+                
+                cursor = self.console.storage.query("""
+                SELECT *
+                FROM tagprotect n 
+                WHERE n.client_id = %s
+                """ % (client.id))
+        
+                if cursor.rowcount == 0:
+                
+                    tag = self._clansecondtag
+                    thread.start_new_thread(self.bantag, (client, event, tag))
+               
+                else:
+                        
+                    thread.start_new_thread(self.wait, (10,))
+                    client.message('Hi ! ^1%s^7 member'%(self._clansecondtag))
+
+                return False            
+
+            elif capprotagmin > 0:
+
+                cnamenotag = cnamemin.split(approtagmin)
+                debcnamenotag = cnamenotag[0]
+                fincnamenotag = cnamenotag[1]
+
+                if (debcnamenotag[-1:] not in "abcdefghijklmnopqrstuvwxyz") or (fincnamenotag[:1] not in "abcdefghijklmnopqrstuvwxyz") or (cnamemin.find(approtagmin)==0):
+               
                     cursor = self.console.storage.query("""
                     SELECT *
                     FROM tagprotect n 
@@ -125,68 +171,22 @@ class TagprotectPlugin(b3.plugin.Plugin):
         
                     if cursor.rowcount == 0:
                 
-                        tag = self._clanexacttag
-                        thread.start_new_thread(self.bantag, (client, event, tag))
-                
+                        thread.start_new_thread(self.kicktag, (client, event, approtagmin))
+               
                     else:
                         
-                        thread.start_new_thread(self.wait, (10,))
+                        time.sleep(10)
                         client.message('Hi ! ^1%s^7 member'%(self._clanexacttag))
                         
                         return False
-                
-                elif csecondtagmin > 0:
-                
-                    cursor = self.console.storage.query("""
-                    SELECT *
-                    FROM tagprotect n 
-                    WHERE n.client_id = %s
-                    """ % (client.id))
-        
-                    if cursor.rowcount == 0:
-                
-                        tag = self._clansecondtag
-                        thread.start_new_thread(self.bantag, (client, event, tag))
-               
-                    else:
-                        
-                        thread.start_new_thread(self.wait, (10,))
-                        client.message('Hi ! ^1%s^7 member'%(self._clansecondtag))
-
-                    return False            
-
-                elif capprotagmin > 0:
-
-                    cnamenotag = cnamemin.split(approtagmin)
-                    debcnamenotag = cnamenotag[0]
-                    fincnamenotag = cnamenotag[1]
-
-                    if (debcnamenotag[-1:] not in "abcdefghijklmnopqrstuvwxyz") or (fincnamenotag[:1] not in "abcdefghijklmnopqrstuvwxyz") or (cnamemin.find(approtagmin)==0):
-               
-                        cursor = self.console.storage.query("""
-                        SELECT *
-                        FROM tagprotect n 
-                        WHERE n.client_id = %s
-                        """ % (client.id))
-        
-                        if cursor.rowcount == 0:
-                
-                            thread.start_new_thread(self.kicktag, (client, event, approtagmin))
-               
-                        else:
-                        
-                            time.sleep(10)
-                            client.message('Hi ! ^1%s^7 member'%(self._clanexacttag))
-                        
-                            return False
                               
-                    else:
-                
-                        return False
-            
                 else:
-            
+                
                     return False
+            
+            else:
+            
+                return False
 
     def kicktag(self, client, event, approtagmin):
         
