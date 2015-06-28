@@ -130,7 +130,7 @@ class TagprotectPlugin(b3.plugin.Plugin):
                 
                 else:
                         
-                    time.sleep(10)
+                    thread.start_new_thread(self.wait, (10,))
                     client.message('Hi ! ^1%s^7 member'%(self._clanexacttag))
                         
                     return False
