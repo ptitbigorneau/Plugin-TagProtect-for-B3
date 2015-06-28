@@ -1,7 +1,7 @@
 # TagProtect Plugin
 
 __author__  = 'PtitBigorneau www.ptitbigorneau.fr'
-__version__ = '1.4'
+__version__ = '1.4.1'
 
 
 import b3, threading, thread, time
@@ -130,7 +130,7 @@ class TagprotectPlugin(b3.plugin.Plugin):
                 
                 else:
                         
-                    thread.start_new_thread(self.wait, (10,))
+                    time.sleep(10)
                     client.message('Hi ! ^1%s^7 member'%(self._clanexacttag))
                         
                     return False
@@ -150,7 +150,7 @@ class TagprotectPlugin(b3.plugin.Plugin):
                
                 else:
                         
-                    thread.start_new_thread(self.wait, (10,))
+                    time.sleep(10)
                     client.message('Hi ! ^1%s^7 member'%(self._clansecondtag))
 
                 return False            
@@ -190,40 +190,40 @@ class TagprotectPlugin(b3.plugin.Plugin):
 
     def kicktag(self, client, event, approtagmin):
         
-        thread.start_new_thread(self.wait, (20,))
+        time.sleep(20)
         client.message('^1%s^7 is the tag of the clan ^1%s^7'%(self._clanexacttag, self._clanname))
-        thread.start_new_thread(self.wait, (2,))         
+        time.sleep(2)         
         client.message('You are not a member of the clan ^1%s^7'%(self._clanname))
-        thread.start_new_thread(self.wait, (2,)) 
+        time.sleep(2) 
         client.message('^1%s^7 in your nickname is not authorized'%(approtagmin))
         client.message('You will be ^1kicked')
-        thread.start_new_thread(self.wait, (10,))
+        time.sleep(10)
         client.kick("%s TagProtect"%(self._clanexacttag),  None)
         
     def bantag(self, client, event, tag):
         
         if self._banactived == 'yes':
         
-            thread.start_new_thread(self.wait, (20,))
+            time.sleep(20)
             client.message('^1%s^7 and ^1%s^7 are the tag of the clan ^1%s^7'%(self._clanexacttag, self._clansecondtag, self._clanname))
-            thread.start_new_thread(self.wait, (2,))        
+            time.sleep(2)        
             client.message('You are not a member of the clan ^1%s^7'%(self._clanname))
-            thread.start_new_thread(self.wait, (2,)) 
+            time.sleep(2) 
             client.message('^1%s^7 in your nickname is not authorized'%(tag))
             client.message('You will be ^1banned')
-            thread.start_new_thread(self.wait, (10,))
+            time.sleep(10)
             client.ban("%s TagProtect"%(tag), None)
         
         else:
         
-            thread.start_new_thread(self.wait, (20,))
+            time.sleep(20)
             client.message('^1%s^7 and ^1%s^7 are the tag of the clan ^1%s^7'%(self._clanexacttag, self._clansecondtag, self._clanname))
-            thread.start_new_thread(self.wait, (2,))         
+            time.sleep(2)         
             client.message('if you are a member of ^1%s^7 clan ! Contact administrator !'%(self._clanname))
-            thread.start_new_thread(self.wait, (2,)) 
+            time.sleep(2) 
             client.message('^1%s^7 in your nickname is not authorized'%(tag))
             client.message('You will be ^1kicked')
-            thread.start_new_thread(self.wait, (10,))
+            time.sleep(10)
             client.kick("%s TagProtect"%(tag),  None)
             
     def cmd_addct(self, data, client, cmd=None):
